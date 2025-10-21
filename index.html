@@ -163,8 +163,21 @@
 
         .badge-java {
             display: inline-block;
-            border: 1px solid #ED8B00;
-            color: #ED8B00;
+            border: 1px solid #c67300;
+            color: #c67300;
+            background-color: transparent;
+            border-radius: 9999px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            font-family: system-ui, sans-serif;
+        }
+
+        .badge-c {
+            display: inline-block;
+            border: 1px solid #808080;
+            color: #808080;
             background-color: transparent;
             border-radius: 9999px;
             padding: 4px 12px;
@@ -198,14 +211,20 @@
 <body>
     <header class="hero">
         <div class="hero-content">
-            <h1>Hey There!</h1>
-            <p>I'm <a href="https://github.com/TayebYassine" style="color: #005bb7;">Tayeb Yassine</a>, a University
+            <h1>Hey There! 👋</h1>
+            <p>I'm Tayeb Yassine, a University
                 Student and A Self-taught Software Developer.</p>
         </div>
     </header>
 
     <main>
         <section class="overview">
+            <div align="center" dir="auto">
+                <a href="https://github.com/TayebYassine">
+                    <img src="https://img.shields.io/badge/GitHub-tayebyassine-blue" />
+                </a>
+            </div>
+
             <div class="container">
                 <h2>Who am I?</h2>
                 <p>I am a <strong>software developer</strong> with expertise in the <strong>Windows operating
@@ -231,6 +250,9 @@
         <section class="projects">
             <div class="container">
                 <h2>My Projects</h2>
+
+                <h3>Discord Bots</h3>
+
                 <ul>
                     <li><strong>Discord.js V14 Bot Template <span class="badge-javascript">JavaScript</span> <a
                                 href="https://github.com/TFAGaming/DiscordJS-V14-Bot-Template"
@@ -252,32 +274,78 @@
                         Discord bot that uses discord.js version 14 and canvacord and has the ability to import Mee6 XP
                         like Lurkr bot.</li>
                 </ul>
+
+                <h3>Bukkit Plugins</h3>
+
                 <ul>
                     <li><strong>Homestead <span class="badge-java">Java</span> <a
-                                href="https://github.com/TFAGaming/Homestead"
+                                href="https://github.com/TayebYassine/Homestead"
                                 style="text-decoration: none;">↗️</a>:</strong> An advanced, chunk-based land claiming
                         plugin for Minecraft servers, with multiple APIs support, based on Bukkit API.</li>
+
+                    <li><strong>RealmProtection <span class="badge-java">Java</span> <span class="badge-archive">Public
+                                Archived</span> <a href="https://github.com/TFAGaming/RealmProtection"
+                                style="text-decoration: none;">↗️</a>:</strong> An early under-development version of
+                        Homestead.
+                    </li>
                 </ul>
+
+                <h3>Code Editors</h3>
+
                 <ul>
+                    <li><strong>NeoPrism <span class="badge-java">Java</span> <a
+                                href="https://github.com/TayebYassine/NeoPrism"
+                                style="text-decoration: none;">↗️</a>:</strong> Coming soon...
+                    </li>
+
+                    <li><strong>Scriptor <span class="badge-java">Java</span> <span class="badge-archive">Public
+                                Archived</span> <a href="https://github.com/TFAGaming/Scriptor"
+                                style="text-decoration: none;">↗️</a>:</strong> A code editor like Visual Studio Code,
+                        but written in Java and using the Java Swing library.
+                    </li>
+
                     <li><strong>SparklyPython <span class="badge-python">Python</span> <span
                                 class="badge-archive">Public Archived</span> <a
                                 href="https://github.com/TFAGaming/SparklyPython"
                                 style="text-decoration: none;">↗️</a>:</strong> A code editor targeting the programming
                         language Python, with syntax highlighting and auto-complete.</li>
                 </ul>
+
+                <h3>Libraries</h3>
+
                 <ul>
                     <li><strong>Quick YAML <span class="badge-typescript">TypeScript</span> <a
                                 href="https://github.com/TFAGaming/quick-yaml.db"
                                 style="text-decoration: none;">↗️</a>:</strong> A Node.js library that interacts with
                         YAML files easily, more like a HashMap but updating an actual file to save data.</li>
+
+                    <li><strong>Velox.db <span class="badge-typescript">TypeScript</span> <a
+                                href="https://github.com/TFAGaming/velox.db"
+                                style="text-decoration: none;">↗️</a>:</strong> An open-source Node.js library that
+                        allows you to store data in a JSON file easily, inspired by MongoDB.</li>
+
+                    <li><strong>Wandbox API.js <span class="badge-typescript">TypeScript</span> <a
+                                href="https://www.npmjs.com/package/wandbox-api.js"
+                                style="text-decoration: none;">↗️</a>:</strong> A basic wrapper for Wandbox, an online
+                        and free API to compile codes in 34 different programming languages.</li>
                 </ul>
+
+                <h3>Others</h3>
+
+                <ul>
+                    <li><strong>Microchip Projects <span class="badge-c">The C Programming Language</span> <a
+                                href="https://github.com/TFAGaming/Microchip-Projects"
+                                style="text-decoration: none;">↗️</a>:</strong> A list of projects using the PIC
+                        microcontrollers, including the PIC 16F series and Proteus 8 schemas.</li>
+                </ul>
+
             </div>
         </section>
 
         <section class="social">
             <div class="container">
                 <h2>Social & Contact</h2>
-                
+
                 <div align="center" dir="auto">
                     <a href="https://discord.gg/E6VFACWu5V">
                         <img src="https://discord.com/api/guilds/918611797194465280/widget.png?style=banner2" />
