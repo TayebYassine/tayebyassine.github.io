@@ -1,25 +1,64 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tayeb Yassine - GitHub Pages</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tayeb Yassine</title>
     <style>
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #fff;
+        /* ---------- GLOBAL ---------- */
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent: #1f6feb;
+            --accent-light: #58a6ff;
+            --section-bg: #161b22;
+            --border-color: #30363d;
+            --badge-bg: transparent;
+            --badge-border: #58a6ff;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        a {
+            color: var(--accent-light);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #f0f6fc;
+        }
+
+        /* ---------- HERO ---------- */
         header.hero {
-            background: linear-gradient(180deg, #4ea8de, #1e90ff);
+            background: linear-gradient(180deg, #1f6feb, #0d419d);
             color: #fff;
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
         }
 
         .hero h1 {
@@ -30,170 +69,233 @@
         .hero p {
             font-size: 1.3rem;
             margin: 0;
+            color: #c9d1d9;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .overview {
-            padding: 60px 0;
-        }
-
-        .overview h2 {
+        .hero {
+            position: relative;
+            background: linear-gradient(180deg, #1f6feb, #0d419d);
+            color: #fff;
             text-align: center;
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #444;
+            padding: 80px 20px;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+
+        .hero.fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 20px;
+            height: 60px;
+            background: rgba(13, 17, 23, 0.95);
+            border-bottom: 1px solid #30363d;
+            backdrop-filter: blur(8px);
+        }
+
+        .hero-content {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .hero-small {
+            position: fixed;
+            top: -80px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #1f6feb, #0d419d);
+            color: #fff;
+            text-align: center;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            z-index: 999;
+        }
+
+        .hero-small.visible {
+            opacity: 1;
+            transform: translateY(0);
+            top: 0;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hero.fixed #hero-content {
+            opacity: 0;
+        }
+
+        .hero.fixed #hero-small {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        main {
+            margin-top: 0;
+            transition: margin-top 0.4s ease;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero-small p {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ---------- OVERVIEW ---------- */
+        .overview {
+            background-color: var(--section-bg);
+            padding: 60px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .overview p {
             margin-bottom: 1em;
         }
 
-        .overview a {
-            color: #1e90ff;
-            text-decoration: none;
-        }
-
-        .overview a:hover {
-            text-decoration: underline;
-        }
-
+        /* ---------- PROJECTS ---------- */
         .projects {
-            background-color: #f7f7f7;
             padding: 60px 0;
         }
 
-        .projects h2 {
-            text-align: center;
-            font-size: 2rem;
-            color: #444;
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
             margin-bottom: 30px;
         }
 
-        .projects ul {
+        .tab {
+            background: #21262d;
+            color: #8b949e;
+            border: 1px solid var(--border-color);
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover {
+            background: #30363d;
+            color: #fff;
+        }
+
+        .tab.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            background: var(--section-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        ul {
             list-style-type: disc;
             padding-left: 40px;
-            max-width: 800px;
-            margin: 0 auto;
         }
 
-        .projects li {
-            margin-bottom: 10px;
+        li {
+            margin-bottom: 12px;
         }
 
-        .social {
-            padding: 60px 0;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .social h2 {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 30px;
-            color: #444;
-        }
-
-        .social p {
-            margin-bottom: 1em;
-        }
-
-        .social a {
-            color: #1e90ff;
-            text-decoration: none;
-        }
-
-        .social a:hover {
-            text-decoration: underline;
+        /* ---------- BADGES ---------- */
+        .badge-archive,
+        .badge-python,
+        .badge-typescript,
+        .badge-javascript,
+        .badge-java,
+        .badge-c {
+            display: inline-block;
+            border-radius: 9999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            font-family: system-ui, sans-serif;
+            background-color: var(--badge-bg);
         }
 
         .badge-archive {
-            display: inline-block;
             border: 1px solid #db0404;
             color: #db0404;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
         .badge-python {
-            display: inline-block;
             border: 1px solid #4B8BBE;
             color: #4B8BBE;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
         .badge-typescript {
-            display: inline-block;
             border: 1px solid #3178c6;
             color: #3178c6;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
         .badge-javascript {
-            display: inline-block;
             border: 1px solid #eacb07;
             color: #eacb07;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
         .badge-java {
-            display: inline-block;
             border: 1px solid #c67300;
             color: #c67300;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
         .badge-c {
-            display: inline-block;
             border: 1px solid #808080;
             color: #808080;
-            background-color: transparent;
-            border-radius: 9999px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1;
-            font-family: system-ui, sans-serif;
         }
 
+        /* ---------- SOCIAL ---------- */
+        .social {
+            padding: 60px 0;
+            background-color: var(--section-bg);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* ---------- FOOTER ---------- */
         footer {
             text-align: center;
             padding: 30px 0;
-            background-color: #fafafa;
+            background-color: #0c1015;
             color: #777;
             font-size: 0.9rem;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border-color);
         }
 
         @media (max-width: 768px) {
@@ -209,41 +311,35 @@
 </head>
 
 <body>
-    <header class="hero">
-        <div class="hero-content">
+    <header class="hero" id="hero">
+        <div class="hero-content" id="hero-content">
             <h1>Hey There! 👋</h1>
-            <p>I'm Tayeb Yassine, a University
-                Student and A Self-taught Software Developer.</p>
+            <p>I'm Tayeb Yassine, a University Student and Self-taught Software Developer.</p>
+        </div>
+
+        <div class="hero-small" id="hero-small">
+            <p><strong>Hey There! 👋</strong>, I'm Tayeb Yassine — a University Student & Self-taught Software
+                Developer.</p>
         </div>
     </header>
 
     <main>
         <section class="overview">
-            <div align="center" dir="auto">
+            <!-- <div align="center">
                 <a href="https://github.com/TayebYassine">
-                    <img src="https://img.shields.io/badge/GitHub-tayebyassine-blue" />
+                    <img src="https://img.shields.io/badge/GitHub-tayebyassine-blue?style=for-the-badge&logo=github" />
                 </a>
-            </div>
+            </div> -->
 
             <div class="container">
                 <h2>Who am I?</h2>
-                <p>I am a <strong>software developer</strong> with expertise in the <strong>Windows operating
-                        system</strong>. I specialize in creating
-                    classic,
-                    lightweight, and powerful applications based on <strong>Java</strong>, using the Java Swing library.
-                </p>
-                <p>I love making open-source projects, so I would collaborate with other developers and create an
-                    amazing public project
-                    for everybody.
-                </p>
-                <p>I have been developing other projects related to different APIs, including the <strong>Discord
-                        API</strong> and
-                    <strong>Instagram API</strong>,
-                    and I have also made plugins for the sandbox game called <strong>Minecraft</strong>.
-                </p>
-                <p>I have been using GitHub since 2021. If you want to view my old profile, which is now my second
-                    profile, <a href="https://github.com/TFAGaming/">click here!</a>
-                </p>
+                <p>I am a <strong>software developer</strong> specializing in <strong>Java</strong> and desktop
+                    applications built on the Java Swing library.</p>
+                <p>I enjoy making <strong>open-source projects</strong> and collaborating with other developers.</p>
+                <p>I've also worked on projects involving the <strong>Discord API</strong>, <strong>Instagram
+                        API</strong>, and <strong>Minecraft plugins</strong>.</p>
+                <p>I've been using GitHub since 2021. If you want to see my older profile, <a
+                        href="https://github.com/TFAGaming/">click here!</a></p>
             </div>
         </section>
 
@@ -251,102 +347,89 @@
             <div class="container">
                 <h2>My Projects</h2>
 
-                <h3>Discord Bots</h3>
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('discord')">Discord Bots</button>
+                    <button class="tab" onclick="showTab('bukkit')">Bukkit Plugins</button>
+                    <button class="tab" onclick="showTab('editors')">Code Editors</button>
+                    <button class="tab" onclick="showTab('libraries')">Libraries</button>
+                    <button class="tab" onclick="showTab('others')">Others</button>
+                </div>
 
-                <ul>
-                    <li><strong>Discord.js V14 Bot Template <span class="badge-javascript">JavaScript</span> <a
-                                href="https://github.com/TFAGaming/DiscordJS-V14-Bot-Template"
-                                style="text-decoration: none;">↗️</a>:</strong> A Discord bot with commands, components
-                        and events handler based on the latest discord.js library version 14 and fully written in
-                        JavaScript.</li>
-                </ul>
-                <ul>
-                    <li><strong>Discord.js V14 Modmail Bot <span class="badge-javascript">JavaScript</span> <a
-                                href="https://github.com/TFAGaming/DiscordJS-V14-Modmail-Bot"
-                                style="text-decoration: none;">↗️</a>:</strong> A Discord bot that allows a user to
-                        communicate with staff members in a single channel by messaging within the bot's private chat.
-                    </li>
-                </ul>
-                <ul>
-                    <li><strong>NetLevel Bot <span class="badge-typescript">TypeScript</span> <a
-                                href="https://github.com/TFAGaming/NetLevel-Bot"
-                                style="text-decoration: none;">↗️</a>:</strong> NetLevel Bot is a powerful leveling
-                        Discord bot that uses discord.js version 14 and canvacord and has the ability to import Mee6 XP
-                        like Lurkr bot.</li>
-                </ul>
+                <!-- Discord Bots -->
+                <div class="tab-content" id="discord">
+                    <ul>
+                        <li><strong>Discord.js V14 Bot Template <span class="badge-javascript">JavaScript</span>
+                                <a href="https://github.com/TFAGaming/DiscordJS-V14-Bot-Template">↗️</a>:</strong> A
+                            modular Discord bot built with discord.js v14.</li>
+                        <li><strong>Discord.js V14 Modmail Bot <span class="badge-javascript">JavaScript</span>
+                                <a href="https://github.com/TFAGaming/DiscordJS-V14-Modmail-Bot">↗️</a>:</strong> A
+                            modmail system for private communication between users and staff.</li>
+                        <li><strong>NetLevel Bot <span class="badge-typescript">TypeScript</span>
+                                <a href="https://github.com/TFAGaming/NetLevel-Bot">↗️</a>:</strong> A powerful Discord
+                            leveling bot that imports Mee6 XP data.</li>
+                    </ul>
+                </div>
 
-                <h3>Bukkit Plugins</h3>
+                <!-- Bukkit Plugins -->
+                <div class="tab-content hidden" id="bukkit">
+                    <ul>
+                        <li><strong>Homestead <span class="badge-java">Java</span>
+                                <a href="https://github.com/TayebYassine/Homestead">↗️</a>:</strong> Chunk-based land
+                            claiming plugin for Minecraft servers.</li>
+                        <li><strong>RealmProtection <span class="badge-java">Java</span> <span
+                                    class="badge-archive">Archived</span>
+                                <a href="https://github.com/TFAGaming/RealmProtection">↗️</a>:</strong> Early version of
+                            Homestead.</li>
+                    </ul>
+                </div>
 
-                <ul>
-                    <li><strong>Homestead <span class="badge-java">Java</span> <a
-                                href="https://github.com/TayebYassine/Homestead"
-                                style="text-decoration: none;">↗️</a>:</strong> An advanced, chunk-based land claiming
-                        plugin for Minecraft servers, with multiple APIs support, based on Bukkit API.</li>
+                <!-- Code Editors -->
+                <div class="tab-content hidden" id="editors">
+                    <ul>
+                        <li><strong>NeoPrism <span class="badge-java">Java</span>
+                                <a href="https://github.com/TayebYassine/NeoPrism">↗️</a>:</strong> Coming soon...</li>
+                        <li><strong>Scriptor <span class="badge-java">Java</span> <span
+                                    class="badge-archive">Archived</span>
+                                <a href="https://github.com/TFAGaming/Scriptor">↗️</a>:</strong> A Java Swing code
+                            editor like VS Code.</li>
+                        <li><strong>SparklyPython <span class="badge-python">Python</span> <span
+                                    class="badge-archive">Archived</span>
+                                <a href="https://github.com/TFAGaming/SparklyPython">↗️</a>:</strong> Python editor with
+                            syntax highlighting and autocomplete.</li>
+                    </ul>
+                </div>
 
-                    <li><strong>RealmProtection <span class="badge-java">Java</span> <span class="badge-archive">Public
-                                Archived</span> <a href="https://github.com/TFAGaming/RealmProtection"
-                                style="text-decoration: none;">↗️</a>:</strong> An early under-development version of
-                        Homestead.
-                    </li>
-                </ul>
+                <!-- Libraries -->
+                <div class="tab-content hidden" id="libraries">
+                    <ul>
+                        <li><strong>Quick YAML <span class="badge-typescript">TypeScript</span>
+                                <a href="https://github.com/TFAGaming/quick-yaml.db">↗️</a>:</strong> Easy YAML handler
+                            for Node.js.</li>
+                        <li><strong>Velox.db <span class="badge-typescript">TypeScript</span>
+                                <a href="https://github.com/TFAGaming/velox.db">↗️</a>:</strong> Simple JSON-based data
+                            storage.</li>
+                        <li><strong>Wandbox API.js <span class="badge-typescript">TypeScript</span>
+                                <a href="https://www.npmjs.com/package/wandbox-api.js">↗️</a>:</strong> Node.js wrapper
+                            for Wandbox online compiler API.</li>
+                    </ul>
+                </div>
 
-                <h3>Code Editors</h3>
-
-                <ul>
-                    <li><strong>NeoPrism <span class="badge-java">Java</span> <a
-                                href="https://github.com/TayebYassine/NeoPrism"
-                                style="text-decoration: none;">↗️</a>:</strong> Coming soon...
-                    </li>
-
-                    <li><strong>Scriptor <span class="badge-java">Java</span> <span class="badge-archive">Public
-                                Archived</span> <a href="https://github.com/TFAGaming/Scriptor"
-                                style="text-decoration: none;">↗️</a>:</strong> A code editor like Visual Studio Code,
-                        but written in Java and using the Java Swing library.
-                    </li>
-
-                    <li><strong>SparklyPython <span class="badge-python">Python</span> <span
-                                class="badge-archive">Public Archived</span> <a
-                                href="https://github.com/TFAGaming/SparklyPython"
-                                style="text-decoration: none;">↗️</a>:</strong> A code editor targeting the programming
-                        language Python, with syntax highlighting and auto-complete.</li>
-                </ul>
-
-                <h3>Libraries</h3>
-
-                <ul>
-                    <li><strong>Quick YAML <span class="badge-typescript">TypeScript</span> <a
-                                href="https://github.com/TFAGaming/quick-yaml.db"
-                                style="text-decoration: none;">↗️</a>:</strong> A Node.js library that interacts with
-                        YAML files easily, more like a HashMap but updating an actual file to save data.</li>
-
-                    <li><strong>Velox.db <span class="badge-typescript">TypeScript</span> <a
-                                href="https://github.com/TFAGaming/velox.db"
-                                style="text-decoration: none;">↗️</a>:</strong> An open-source Node.js library that
-                        allows you to store data in a JSON file easily, inspired by MongoDB.</li>
-
-                    <li><strong>Wandbox API.js <span class="badge-typescript">TypeScript</span> <a
-                                href="https://www.npmjs.com/package/wandbox-api.js"
-                                style="text-decoration: none;">↗️</a>:</strong> A basic wrapper for Wandbox, an online
-                        and free API to compile codes in 34 different programming languages.</li>
-                </ul>
-
-                <h3>Others</h3>
-
-                <ul>
-                    <li><strong>Microchip Projects <span class="badge-c">The C Programming Language</span> <a
-                                href="https://github.com/TFAGaming/Microchip-Projects"
-                                style="text-decoration: none;">↗️</a>:</strong> A list of projects using the PIC
-                        microcontrollers, including the PIC 16F series and Proteus 8 schemas.</li>
-                </ul>
-
+                <!-- Others -->
+                <div class="tab-content hidden" id="others">
+                    <ul>
+                        <li><strong>Microchip Projects <span class="badge-c">C</span>
+                                <a href="https://github.com/TFAGaming/Microchip-Projects">↗️</a>:</strong> PIC
+                            microcontroller projects built in Proteus.</li>
+                    </ul>
+                </div>
             </div>
         </section>
 
         <section class="social">
             <div class="container">
                 <h2>Social & Contact</h2>
-
-                <div align="center" dir="auto">
+                <div align="center">
                     <a href="https://discord.gg/E6VFACWu5V">
                         <img src="https://discord.com/api/guilds/918611797194465280/widget.png?style=banner2" />
                     </a>
@@ -360,6 +443,37 @@
             <p>Copyright © 2025 Tayeb Yassine F. A.</p>
         </div>
     </footer>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+    </script>
+    <script>
+        const hero = document.getElementById("hero");
+        const heroContent = document.getElementById("hero-content");
+        const heroSmall = document.getElementById("hero-small");
+        const main = document.querySelector("main");
+
+        window.addEventListener("scroll", () => {
+            const triggerPoint = hero.offsetHeight - 10; // start transition later
+            if (window.scrollY > triggerPoint) {
+                heroSmall.classList.add("visible");
+                heroContent.style.opacity = "0";
+                heroContent.style.transform = "translateY(-30px)";
+                main.style.marginTop = "60px"; // prevent hiding "Who am I?"
+            } else {
+                heroSmall.classList.remove("visible");
+                heroContent.style.opacity = "1";
+                heroContent.style.transform = "translateY(0)";
+                main.style.marginTop = "0";
+            }
+        });
+    </script>
+
 </body>
 
 </html>
