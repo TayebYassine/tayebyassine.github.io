@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homestead Flags Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f12;
+      --surface:   #13161b;
+      --card:      #1a1e26;
+      --border:    #252a35;
+      --border-hi: #2e3547;
+      --text:      #c8cdd8;
+      --text-dim:  #5a6172;
+      --text-hi:   #e8ecf4;
+      --accent:    #4ade80;
+      --accent-d:  #22c55e;
+      --accent-gl: rgba(74,222,128,.15);
+      --amber:     #fbbf24;
+      --amber-d:   #f59e0b;
+      --sky:       #38bdf8;
+      --sky-d:     #0ea5e9;
+      --red:       #f87171;
+      --red-d:     #ef4444;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* background grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(74,222,128,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,222,128,.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* layout */
+    .wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; }
+
+    /* header */
+    header {
+      padding: 48px 0 32px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    header h1 {
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 800; color: var(--text-hi);
+      line-height: 1.1;
+    }
+    header h1 span { color: var(--accent); }
+    header p {
+      font-size: 14px; color: var(--text-dim); max-width: 500px; line-height: 1.6;
+      margin-top: 4px;
+    }
+
+    /* sticky output bar */
+    .output-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,18,.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+      margin-bottom: 32px;
+    }
+    .output-bar-inner {
+      max-width: 1100px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .output-label {
+      font-family: var(--mono);
+      font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+      color: var(--text-dim); white-space: nowrap;
+    }
+    .output-value {
+      font-family: var(--mono);
+      font-size: 20px; font-weight: 700;
+      color: var(--accent);
+      flex: 1; min-width: 80px;
+      transition: color .2s;
+    }
+    .output-value.zero { color: var(--text-dim); }
+    .btn-copy {
+      font-family: var(--mono);
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      background: var(--accent-gl);
+      color: var(--accent);
+      border: 1px solid rgba(74,222,128,.3);
+      padding: 6px 14px; border-radius: 6px;
+      cursor: pointer; transition: all .15s;
+      white-space: nowrap;
+    }
+    .btn-copy:hover { background: rgba(74,222,128,.25); border-color: var(--accent); }
+    .btn-copy.copied { color: var(--amber); background: rgba(251,191,36,.12); border-color: rgba(251,191,36,.3); }
+
+    /* decode input */
+    .decode-wrap {
+      display: flex; align-items: center; gap: 8px;
+      margin-left: auto;
+    }
+    .decode-input {
+      font-family: var(--mono);
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-hi);
+      padding: 6px 12px;
+      border-radius: 6px;
+      width: 160px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .decode-input::placeholder { color: var(--text-dim); }
+    .decode-input:focus { border-color: var(--border-hi); }
+    .decode-input.valid   { border-color: rgba(74,222,128,.5); }
+    .decode-input.invalid { border-color: rgba(248,113,113,.5); }
+    .decode-hint {
+      font-family: var(--mono);
+      font-size: 10px; color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    /* tabs */
+    .tabs {
+      display: flex; gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      font-family: var(--sans);
+      font-size: 13px; font-weight: 600;
+      padding: 10px 20px;
+      background: none; border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      position: relative;
+      transition: color .15s;
+      border-radius: 6px 6px 0 0;
+    }
+    .tab-btn::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 2px;
+      background: transparent;
+      transition: background .15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--text-hi); }
+
+    .tab-btn[data-tab="player"].active::after { background: var(--accent); }
+    .tab-btn[data-tab="world"].active::after  { background: var(--sky); }
+    .tab-btn[data-tab="control"].active::after { background: var(--amber); }
+
+    .tab-btn[data-tab="player"].active { color: var(--accent); }
+    .tab-btn[data-tab="world"].active  { color: var(--sky); }
+    .tab-btn[data-tab="control"].active { color: var(--amber); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* section toolbar */
+    .section-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
+    }
+    .section-info { font-size: 13px; color: var(--text-dim); }
+    .section-info strong { color: var(--text); }
+    .toolbar-btns { display: flex; gap: 8px; }
+    .btn-sm {
+      font-family: var(--mono);
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 5px 10px; border-radius: 5px;
+      cursor: pointer; transition: all .15s; border: 1px solid;
+    }
+    .btn-select-all  { color: var(--accent); border-color: rgba(74,222,128,.25); background: var(--accent-gl); }
+    .btn-select-all:hover  { background: rgba(74,222,128,.22); border-color: var(--accent); }
+    .btn-deselect-all { color: var(--red); border-color: rgba(248,113,113,.2); background: rgba(248,113,113,.07); }
+    .btn-deselect-all:hover { background: rgba(248,113,113,.15); border-color: var(--red); }
+    .btn-reset-all { color: var(--amber); border-color: rgba(251,191,36,.2); background: rgba(251,191,36,.07); }
+    .btn-reset-all:hover { background: rgba(251,191,36,.15); border-color: var(--amber); }
+
+    /* flag grid */
+    .flags-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 8px;
+    }
+
+    /* flag card */
+    .flag-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex; align-items: flex-start; gap: 12px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s, transform .1s;
+      user-select: none;
+    }
+    .flag-card:hover:not(.disabled) {
+      border-color: var(--border-hi);
+      background: #1e2330;
+    }
+    .flag-card.disabled {
+      opacity: .4; cursor: not-allowed;
+    }
+
+    /* checked states by tab */
+    #panel-player .flag-card.checked  { border-color: rgba(74,222,128,.4); background: rgba(74,222,128,.05); }
+    #panel-world  .flag-card.checked  { border-color: rgba(56,189,248,.4); background: rgba(56,189,248,.05); }
+    #panel-control .flag-card.checked { border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.05); }
+
+    /* checkbox */
+    .flag-checkbox {
+      width: 18px; height: 18px;
+      border-radius: 4px; border: 2px solid var(--border-hi);
+      flex-shrink: 0; margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+      background: var(--surface);
+    }
+    #panel-player .flag-card.checked .flag-checkbox  { background: var(--accent);  border-color: var(--accent); }
+    #panel-world  .flag-card.checked .flag-checkbox  { background: var(--sky);     border-color: var(--sky); }
+    #panel-control .flag-card.checked .flag-checkbox { background: var(--amber);   border-color: var(--amber); }
+
+    .flag-checkbox svg { display: none; }
+    .flag-card.checked .flag-checkbox svg { display: block; }
+
+    .flag-body { flex: 1; min-width: 0; }
+    .flag-name {
+      font-family: var(--mono);
+      font-size: 12px; font-weight: 600;
+      color: var(--text-hi);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .flag-desc {
+      font-size: 11px; color: var(--text-dim);
+      margin-top: 2px; line-height: 1.5;
+    }
+    .flag-value {
+      font-family: var(--mono);
+      font-size: 10px;
+      margin-top: 4px;
+    }
+    #panel-player  .flag-value { color: rgba(74,222,128,.5); }
+    #panel-world   .flag-value { color: rgba(56,189,248,.5); }
+    #panel-control .flag-value { color: rgba(251,191,36,.5); }
+    #panel-player  .flag-card.checked .flag-value { color: rgba(74,222,128,.8); }
+    #panel-world   .flag-card.checked .flag-value { color: rgba(56,189,248,.8); }
+    #panel-control .flag-card.checked .flag-value { color: rgba(251,191,36,.8); }
+    #panel-player .flag-card.checked  .flag-name { color: var(--accent); }
+    #panel-world  .flag-card.checked  .flag-name { color: var(--sky); }
+    #panel-control .flag-card.checked .flag-name { color: var(--amber); }
+
+    /* default badge */
+    .default-on {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9px; letter-spacing: .05em; text-transform: uppercase;
+      padding: 1px 5px; border-radius: 3px;
+      margin-left: 6px;
+      background: rgba(74,222,128,.1); color: var(--accent);
+      border: 1px solid rgba(74,222,128,.2);
+      vertical-align: middle;
+    }
+    .deprecated-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 9px; letter-spacing: .05em; text-transform: uppercase;
+      padding: 1px 5px; border-radius: 3px; margin-left: 6px;
+      background: rgba(248,113,113,.1); color: var(--red);
+      border: 1px solid rgba(248,113,113,.2);
+      vertical-align: middle;
+    }
+
+    /* footer */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 11px; color: var(--text-dim);
+      padding: 24px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="output-bar">
+  <div class="output-bar-inner">
+    <span class="output-label">Bitwise Value =</span>
+    <span class="output-value zero" id="global-output">0</span>
+    <button class="btn-copy" id="btn-copy-global" onclick="copyValue()">Copy</button>
+    <div class="decode-wrap">
+      <input class="decode-input" id="decode-input" type="text" placeholder="Paste to decode…" oninput="decodeInput(this)" />
+      <span class="decode-hint" id="decode-hint"></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+  <header>
+    <h3>Homestead</h3>
+    <h1>Flags <span>Calculator</span></h1>
+    <p>Select flags to compute the combined bitwise value. Switch tabs to configure Player, World, and Control flags independently.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="player" onclick="switchTab('player')">Player Flags</button>
+    <button class="tab-btn"        data-tab="world"   onclick="switchTab('world')">World Flags</button>
+    <button class="tab-btn"        data-tab="control" onclick="switchTab('control')">Control Flags</button>
+  </div>
+
+  <!-- PLAYER FLAGS -->
+  <div class="tab-panel active" id="panel-player">
+    <div class="section-toolbar">
+      <div class="section-info">
+        <strong id="player-count">0</strong> Flags selected
+      </div>
+      <div class="toolbar-btns">
+        <button class="btn-sm btn-select-all"   onclick="selectAll('player')">Select All</button>
+        <button class="btn-sm btn-deselect-all" onclick="deselectAll('player')">Deselect All</button>
+        <button class="btn-sm btn-reset-all"    onclick="resetDefaults('player')">Reset Defaults</button>
+      </div>
+    </div>
+    <div class="flags-grid" id="grid-player"></div>
+  </div>
+
+  <!-- WORLD FLAGS -->
+  <div class="tab-panel" id="panel-world">
+    <div class="section-toolbar">
+      <div class="section-info">
+        <strong id="world-count">0</strong> Flags selected
+      </div>
+      <div class="toolbar-btns">
+        <button class="btn-sm btn-select-all"   onclick="selectAll('world')">Select All</button>
+        <button class="btn-sm btn-deselect-all" onclick="deselectAll('world')">Deselect All</button>
+        <button class="btn-sm btn-reset-all"    onclick="resetDefaults('world')">Reset Defaults</button>
+      </div>
+    </div>
+    <div class="flags-grid" id="grid-world"></div>
+  </div>
+
+  <!-- CONTROL FLAGS -->
+  <div class="tab-panel" id="panel-control">
+    <div class="section-toolbar">
+      <div class="section-info">
+        <strong id="control-count">0</strong> Flags selected
+      </div>
+      <div class="toolbar-btns">
+        <button class="btn-sm btn-select-all"   onclick="selectAll('control')">Select All</button>
+        <button class="btn-sm btn-deselect-all" onclick="deselectAll('control')">Deselect All</button>
+        <button class="btn-sm btn-reset-all"    onclick="resetDefaults('control')">Reset Defaults</button>
+      </div>
+    </div>
+    <div class="flags-grid" id="grid-control"></div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer>Homestead Flags Calculator &nbsp;·&nbsp; <a href="https://github.com/TayebYassine/Homestead/blob/main/src/main/java/tfagaming/projects/minecraft/homestead/flags/FlagsCalculator.java" style="color:var(--text-hi);">FlagsCalculator.java</a></footer>
+
+<script>
+  const FLAGS = {
+    player: [
+      { name: 'break-blocks',            bit: 1n,          defaultOn: false, desc: 'Break/destroy blocks' },
+      { name: 'place-blocks',            bit: 2n,          defaultOn: false, desc: 'Place blocks' },
+      { name: 'containers',              bit: 4n,          defaultOn: false, desc: 'Open chests, barrels, shulker boxes' },
+      { name: 'doors',                   bit: 8n,          defaultOn: false, desc: 'Open/close doors' },
+      { name: 'trap-doors',              bit: 16n,         defaultOn: false, desc: 'Open/close trapdoors' },
+      { name: 'fence-gates',             bit: 32n,         defaultOn: false, desc: 'Open/close fence gates' },
+      { name: 'use-anvil',               bit: 64n,         defaultOn: false, desc: 'Use anvils' },
+      { name: 'redstone',                bit: 128n,        defaultOn: false, desc: 'Interact with redstone components' },
+      { name: 'levers',                  bit: 256n,        defaultOn: false, desc: 'Use levers' },
+      { name: 'buttons',                 bit: 512n,        defaultOn: false, desc: 'Press buttons' },
+      { name: 'pressure-plates',         bit: 1024n,       defaultOn: false, desc: 'Trigger pressure plates' },
+      { name: 'use-bells',               bit: 2048n,       defaultOn: false, desc: 'Ring bells' },
+      { name: 'trigger-tripwire',        bit: 4096n,       defaultOn: false, desc: 'Activate tripwires' },
+      { name: 'frost-walker',            bit: 8192n,       defaultOn: false, desc: 'Use frost walker boots' },
+      { name: 'harvest-crops',           bit: 16384n,      defaultOn: false, desc: 'Harvest/break crops' },
+      { name: 'block-trampling',         bit: 32768n,      defaultOn: false, desc: 'Trample farmland/turtle eggs' },
+      { name: 'general-interaction',     bit: 65536n,      defaultOn: false, desc: 'General interaction catch-all' },
+      { name: 'armor-stands',            bit: 131072n,     defaultOn: false, desc: 'Remove armor from armor stands' },
+      { name: 'interact-entities',       bit: 262144n,     defaultOn: false, desc: 'Interact with entities' },
+      { name: 'item-frame-interaction',  bit: 524288n,     defaultOn: false, desc: 'Add/remove items from item frames' },
+      { name: 'damage-passive-entities', bit: 1048576n,    defaultOn: false, desc: 'Kill passive mobs' },
+      { name: 'damage-hostile-entities', bit: 2097152n,    defaultOn: false, desc: 'Kill hostile mobs' },
+      { name: 'trade-villagers',         bit: 4194304n,    defaultOn: false, desc: 'Trade with villagers' },
+      { name: 'ignite',                  bit: 8388608n,    defaultOn: false, desc: 'Start fires with flint and steel' },
+      { name: 'vehicles',                bit: 16777216n,   defaultOn: false, desc: 'Ride minecarts, horses, boats' },
+      { name: 'teleport-spawn',          bit: 33554432n,   defaultOn: false, desc: 'Teleport to region spawn' },
+      { name: 'passthrough',             bit: 67108864n,   defaultOn: true,  desc: 'Enter/move through region (false = private)' },
+      { name: 'pvp',                     bit: 134217728n,  defaultOn: false, desc: 'PvP combat' },
+      { name: 'take-fall-damage',        bit: 268435456n,  defaultOn: true,  desc: 'Take fall damage (disable for parkour areas)' },
+      { name: 'teleport',                bit: 536870912n,  defaultOn: false, desc: 'Ender pearls / chorus fruit' },
+      { name: 'throw-potions',           bit: 1073741824n, defaultOn: false, desc: 'Throw splash/lingering potions' },
+      { name: 'pickup-items',            bit: 2147483648n, defaultOn: true,  desc: 'Pick up dropped items' },
+      { name: 'sleep',                   bit: 4294967296n, defaultOn: false, desc: 'Use beds' },
+      { name: 'trigger-raid',            bit: 8589934592n, defaultOn: false, desc: 'Start raids with Bad Omen' },
+      { name: 'elytra',                  bit: 17179869184n,defaultOn: true,  desc: 'Elytra flight' },
+      { name: 'spawn-entities',          bit: 34359738368n,defaultOn: false, desc: 'Use spawn eggs' },
+    ],
+    world: [
+      { name: 'passive-entity-spawn',    bit: 1n,       defaultOn: true,  desc: 'Passive mobs (animals) spawn' },
+      { name: 'hostile-entity-spawn',    bit: 2n,       defaultOn: true,  desc: 'Hostile mobs (monsters) spawn' },
+      { name: 'entity-grief',            bit: 4n,       defaultOn: false, desc: 'Entities damage blocks (except creepers)' },
+      { name: 'entity-damage',           bit: 8n,       defaultOn: false, desc: 'Entities attack each other' },
+      { name: 'leaves-decay',            bit: 16n,      defaultOn: true,  desc: 'Leaves decay naturally' },
+      { name: 'fire-spread',             bit: 32n,      defaultOn: false, desc: 'Fire spreads to other blocks' },
+      { name: 'liquid-flow',             bit: 64n,      defaultOn: false, desc: 'Water/lava flows into region from outside' },
+      { name: 'explosion-damage',        bit: 128n,     defaultOn: false, desc: 'Explosions damage blocks (except wither)' },
+      { name: 'wither-damage',           bit: 256n,     defaultOn: false, desc: 'Wither damage' },
+      { name: 'wilderness-pistons',      bit: 512n,     defaultOn: false, desc: 'Pistons outside push blocks into region' },
+      { name: 'wilderness-dispensers',   bit: 1024n,    defaultOn: false, desc: 'Dispensers outside dispense into region' },
+      { name: 'wilderness-minecarts',    bit: 2048n,    defaultOn: false, desc: 'Minecarts from outside enter region' },
+      { name: 'plant-growth',            bit: 4096n,    defaultOn: true,  desc: 'Crops, saplings grow' },
+      { name: 'grass-growth',            bit: 8192n,    defaultOn: true,  desc: 'Grass spreads' },
+      { name: 'sculk-spread',            bit: 16384n,   defaultOn: true,  desc: 'Sculk spreads from shriekers' },
+      { name: 'player-glowing',          bit: 32768n,   defaultOn: true,  desc: 'Players have glowing effect' },
+      { name: 'snow-melting',            bit: 65536n,   defaultOn: true,  desc: 'Snow melts' },
+      { name: 'ice-melting',             bit: 131072n,  defaultOn: true,  desc: 'Ice melts' },
+      { name: 'snowman-trails',          bit: 262144n,  defaultOn: true,  desc: 'Snow golems leave snow trails' },
+      { name: 'windcharge-burst',        bit: 524288n,  defaultOn: false, desc: 'Wind charges burst' },
+      { name: 'copper-golems-interaction', bit: 1048576n, defaultOn: false, desc: 'Copper golems open copper chests within region', deprecated: true },
+      { name: 'wars',                    bit: 2097152n, defaultOn: false, desc: 'Region can be targeted for war' },
+      { name: 'projectiles',             bit: 4194304n, defaultOn: false, desc: 'Projectiles from any source except players' },
+      { name: 'weather-snow',            bit: 8388608n, defaultOn: true,  desc: 'Snow forms during storms (in cold biomes)' },
+    ],
+    control: [
+      { name: 'trust-players',       bit: 1n,      defaultOn: false, desc: 'Invite and trust players' },
+      { name: 'untrust-players',     bit: 2n,      defaultOn: false, desc: 'Untrust players' },
+      { name: 'ban-players',         bit: 4n,      defaultOn: false, desc: 'Ban players' },
+      { name: 'unban-players',       bit: 8n,      defaultOn: false, desc: 'Unban players' },
+      { name: 'claim-chunks',        bit: 16n,     defaultOn: false, desc: 'Claim chunks' },
+      { name: 'unclaim-chunks',      bit: 32n,     defaultOn: false, desc: 'Unclaim chunks' },
+      { name: 'deposit-money',       bit: 64n,     defaultOn: false, desc: 'Deposit money to bank' },
+      { name: 'withdraw-money',      bit: 128n,    defaultOn: false, desc: 'Withdraw money from bank' },
+      { name: 'set-global-flags',    bit: 256n,    defaultOn: false, desc: 'Manage global player flags' },
+      { name: 'set-world-flags',     bit: 512n,    defaultOn: false, desc: 'Manage world flags' },
+      { name: 'set-member-flags',    bit: 1024n,   defaultOn: false, desc: 'Manage member flags' },
+      { name: 'set-spawn',           bit: 2048n,   defaultOn: false, desc: 'Change region spawn location' },
+      { name: 'manage-subareas',     bit: 4096n,   defaultOn: false, desc: 'Manage sub-areas' },
+      { name: 'rename-region',       bit: 8192n,   defaultOn: false, desc: 'Rename the region (incl. display name)' },
+      { name: 'set-description',     bit: 16384n,  defaultOn: false, desc: 'Update region description' },
+      { name: 'manage-logs',         bit: 32768n,  defaultOn: false, desc: 'Manage logs' },
+      { name: 'kick-players',        bit: 65536n,  defaultOn: false, desc: 'Kick players wandering within region borders' },
+      { name: 'set-weather-and-time',bit: 131072n, defaultOn: false, desc: 'Configure weather and time' },
+    ],
+  };
+
+  const state = { player: {}, world: {}, control: {} };
+  let activeTab = 'player';
+
+  function init() {
+    for (const tab of ['player', 'world', 'control']) {
+      const grid = document.getElementById('grid-' + tab);
+      FLAGS[tab].forEach((f) => {
+        state[tab][f.name] = f.deprecated ? false : f.defaultOn;
+        const card = buildCard(f, tab);
+        grid.appendChild(card);
+      });
+      updateCount(tab);
+    }
+    recalculate();
+  }
+
+  function buildCard(f, tab) {
+    const card = document.createElement('div');
+    card.className = 'flag-card' +
+      (f.deprecated ? ' disabled' : '') +
+      (state[tab][f.name] ? ' checked' : '');
+    card.dataset.name = f.name;
+    card.dataset.tab  = tab;
+
+    card.innerHTML = `
+      <div class="flag-checkbox">
+        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+          <path d="M1 3.5L3.8 6.5L9 1" stroke="${tab === 'player' ? '#0d0f12' : tab === 'world' ? '#0d0f12' : '#0d0f12'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="flag-body">
+        <div class="flag-name">
+          ${f.name}
+          ${f.defaultOn && !f.deprecated ? '<span class="default-on">default on</span>' : ''}
+          ${f.deprecated ? '<span class="deprecated-badge">deprecated</span>' : ''}
+        </div>
+        <div class="flag-desc">${f.desc}</div>
+        <div class="flag-value">Bit: ${f.bit.toString()}</div>
+      </div>`;
+
+    if (!f.deprecated) {
+      card.addEventListener('click', () => toggle(tab, f.name));
+    }
+    return card;
+  }
+
+  function toggle(tab, name) {
+    state[tab][name] = !state[tab][name];
+    const card = document.querySelector(`#panel-${tab} .flag-card[data-name="${name}"]`);
+    card.classList.toggle('checked', state[tab][name]);
+    updateCount(tab);
+    recalculate();
+  }
+
+  function selectAll(tab) {
+    FLAGS[tab].forEach((f) => { if (!f.deprecated) state[tab][f.name] = true; });
+    syncCards(tab); updateCount(tab); recalculate();
+  }
+  function deselectAll(tab) {
+    FLAGS[tab].forEach((f) => { if (!f.deprecated) state[tab][f.name] = false; });
+    syncCards(tab); updateCount(tab); recalculate();
+  }
+  function resetDefaults(tab) {
+    FLAGS[tab].forEach((f) => { state[tab][f.name] = f.deprecated ? false : f.defaultOn; });
+    syncCards(tab); updateCount(tab); recalculate();
+  }
+
+  function syncCards(tab) {
+    document.querySelectorAll(`#panel-${tab} .flag-card`).forEach((card) => {
+      card.classList.toggle('checked', !!state[tab][card.dataset.name]);
+    });
+  }
+
+  function recalculate() {
+    const flags = FLAGS[activeTab];
+    let combined = 0n;
+    flags.forEach((f) => { if (state[activeTab][f.name]) combined |= f.bit; });
+    const el = document.getElementById('global-output');
+    el.textContent = combined.toString();
+    el.classList.toggle('zero', combined === 0n);
+  }
+
+  function updateCount(tab) {
+    const count = FLAGS[tab].filter((f) => !f.deprecated && state[tab][f.name]).length;
+    document.getElementById(tab + '-count').textContent = count;
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-panel').forEach((p) => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    // clear decode state on tab change
+    const di = document.getElementById('decode-input');
+    di.value = ''; di.className = 'decode-input';
+    document.getElementById('decode-hint').textContent = '';
+    recalculate();
+  }
+
+  function copyValue() {
+    const val = document.getElementById('global-output').textContent;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.getElementById('btn-copy-global');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    });
+  }
+
+  function decodeInput(el) {
+    const raw = el.value.trim();
+    const hint = document.getElementById('decode-hint');
+    if (raw === '') {
+      el.className = 'decode-input';
+      hint.textContent = '';
+      return;
+    }
+    let val;
+    try { val = BigInt(raw); } catch (_) {
+      el.className = 'decode-input invalid';
+      hint.textContent = 'Invalid';
+      return;
+    }
+    if (val < 0n) {
+      el.className = 'decode-input invalid';
+      hint.textContent = 'Must be unsigned';
+      return;
+    }
+    el.className = 'decode-input valid';
+    FLAGS[activeTab].forEach((f) => {
+      if (!f.deprecated) state[activeTab][f.name] = (val & f.bit) !== 0n;
+    });
+    syncCards(activeTab);
+    updateCount(activeTab);
+    recalculate();
+    const matched = FLAGS[activeTab].filter((f) => !f.deprecated && state[activeTab][f.name]).length;
+    hint.textContent = matched + ' Matched';
+  }
+
+  init();
+</script>
+</body>
+</html>
